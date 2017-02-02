@@ -1,0 +1,19 @@
+#!/bin/sh
+
+BLOCKEDIPURL="{{ pf_blockiplist_url }}"
+OUTPUTFILE=/tmp/blockedip.txt
+PF_TABLE="{{ pf_blockiplist_pf_table }}"
+
+/sbin/pfctl -s Tables |grep "^$PF_TABLE\$" > /dev/null 2>&1
+if [ "$?" != "0" ]; then
+  OPERATION="add" 
+else
+  OPERATION="replace"
+fi
+
+ftp -o "$OUTPUTFILE" $BLOCKEDIPURL 
+if [ "$?" == "0" ]; then
+  /sbin/pfctl -t $PF_TABLE -T $OPERATION -f $OUTPUTFILE > /dev/null 2>&1 
+else
+  echo "Unable to download $BLOCKEDIPURL"
+fi

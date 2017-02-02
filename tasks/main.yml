@@ -1,0 +1,30 @@
+---
+# tasks file for ansible.pf_blockiplist
+
+- name: ensure we run on OpenBSD or FreeBSD
+  fail: msg="{{ ansible_os_family }} not supported by this role" 
+  when: ( ansible_os_family  != 'OpenBSD' ) and ( ansible_os_family  != 'FreeBSD' )
+  tags: [ 'pf' ]
+
+- name: generate script
+  become: true
+  template: src=pf_blockiplist.sh.j2 dest="/root/pf_blockiplist.sh" owner=root group=wheel mode=0750
+  tags: [ 'pf' ]
+
+- name: crontab setup
+  become: true
+  when: pf_blockiplist_cron_enable
+  cron:
+    name: 'update block list ip in pf'
+    minute: "{{ pf_blockiplist_cron_min }}"
+    hour: "{{ pf_blockiplist_cron_hour }}"
+    day: "{{ pf_blockiplist_cron_day }}"
+    month: "{{ pf_blockiplist_cron_month }}"
+    job: '/root/pf_blockiplist.sh'
+  tags: [ 'pf' ]
+
+- name: run the script now
+  become: true
+  when: pf_blocklist_run_now
+  shell: '/root/pf_blockiplist.sh'
+  tags: [ 'pf' ]

@@ -1,0 +1,11 @@
+---
+# defaults file for ansible.pf_blockiplist
+
+pf_blockiplist_pf_table: "BLOCKEDIP"
+pf_blockiplist_cron_enable: yes
+pf_blockiplist_cron_min: '*/30'
+pf_blockiplist_cron_hour: '*'
+pf_blockiplist_cron_day: '*'
+pf_blockiplist_cron_month: '*'
+pf_blockiplist_url: 'https://lists.blocklist.de/lists/all.txt'	#file must contain one ip[/subnet mask] per line, comment possible
+pf_blocklist_run_now: yes
